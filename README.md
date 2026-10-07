@@ -84,8 +84,8 @@ Un *Fork* es una copia personal de este repositorio en tu propia cuenta de GitHu
 Descarga tu *Fork* a tu computadora desde la terminal:
 
 ```bash
-git clone https://github.com/TU-USUARIO/chemistry-ar.git
-cd chemistry-ar
+git clone https://github.com/TU-USUARIO/atomosDPA_IF.git
+cd atomosDPA_IF
 npm install
 
 ```
