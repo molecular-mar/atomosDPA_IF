@@ -1,11 +1,8 @@
 import { useState } from 'react';
+import modelsData from './data/modelsData.json';
 import MoleculeViewer from './components/Scene/MoleculeViewer';
 import HandTrackingPanel from './components/HandTracking/HandTrackingPanel';
 import ARButton from './components/UI/ARButton';
-
-const BASE = import.meta.env.BASE_URL.endsWith('/')
-  ? import.meta.env.BASE_URL
-  : `${import.meta.env.BASE_URL}/`;
 
 interface AtomicSystem {
   id: string;
@@ -17,33 +14,13 @@ interface AtomicSystem {
   hasAnimation: boolean;
 }
 
-const INITIAL_CATALOG: AtomicSystem[] = [
-  { 
-    id: 'aspirin', 
-    name: 'Molécula de Aspirina', 
-    category: 'Molécula Pequeña', 
-    chemicalFormula: 'C9H8O4',
-    description: 'Fármaco analgésico ampliamente utilizado. Permite observar las vibraciones térmicas de los enlaces intra-moleculares.',
-    modelUrl: `${BASE}models/aspirin.glb`,
-    hasAnimation: true 
-  },
-  { 
-    id: 'graphene', 
-    name: 'Capa de Grafeno', 
-    category: 'Superficie / Material', 
-    chemicalFormula: 'C',
-    description: 'Estructura bidimensional de átomos de carbono dispuestos en una red hexagonal tipo panal de abeja.',
-    modelUrl: `${BASE}models/graphene.glb`,
-    hasAnimation: false 
-  },
-];
-
 export default function App() {
-  const [selectedModel, setSelectedModel] = useState<AtomicSystem>(INITIAL_CATALOG[0]);
+  // Usamos tu JSON para inicializar el catálogo
+  const [selectedModel, setSelectedModel] = useState<AtomicSystem>(modelsData[0]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', fontFamily: 'system-ui, sans-serif' }}>
-      {/* Encabezado Superior */}
+      {/* Encabezado Superior (Mantenemos el de tus compañeros) */}
       <header style={{ 
         padding: '0.85rem 1.5rem', 
         backgroundColor: '#0f172a', 
@@ -68,7 +45,8 @@ export default function App() {
 
       {/* Cuerpo Principal */}
       <div style={{ display: 'flex', flex: 1, position: 'relative', overflow: 'hidden' }}>
-        {/* Lienzo 3D */}
+        
+        {/* Lienzo 3D (Mantenemos el de tus compañeros) */}
         <main style={{ flex: 1, position: 'relative' }}>
           <MoleculeViewer 
             modelUrl={selectedModel.modelUrl} 
@@ -81,7 +59,7 @@ export default function App() {
           />
         </main>
 
-        {/* Panel Lateral de Contenido */}
+        {/* Panel Lateral de Contenido (Mezclamos el diseño de ellos con tu lista) */}
         <aside style={{ 
           width: '320px', 
           backgroundColor: '#0f172a', 
@@ -97,8 +75,10 @@ export default function App() {
             <h2 style={{ fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', color: '#94a3b8' }}>
               Catálogo de Sistemas
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {INITIAL_CATALOG.map((item) => {
+            
+            {/* Aquí está tu lista dinámica con scroll añadido para los 13 modelos */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '450px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+              {modelsData.map((item) => {
                 const isSelected = selectedModel.id === item.id;
                 return (
                   <button
@@ -128,7 +108,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Información Detallada del Sistema Seleccionado */}
+          {/* Información Detallada (Mantenemos el diseño de tus compañeros) */}
           <div style={{ 
             borderTop: '1px solid #1e293b', 
             paddingTop: '1rem', 
