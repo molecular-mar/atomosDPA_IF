@@ -11,15 +11,15 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
 const normalizeModelUrl = (url: string) =>
   `${BASE}${url.replace(/^\/+/, '')}`;
 
-interface AtomicSystem {
-  id: string;
-  name: string;
-  category: string;
-  chemicalFormula: string;
-  description: string;
-  modelUrl: string;
-  hasAnimation: boolean;
-}
+//interface AtomicSystem {
+//  id: string;
+//  name: string;
+//  category: string;
+//  chemicalFormula: string;
+//  description: string;
+//  modelUrl: string;
+//  hasAnimation: boolean;
+//}
 
 export default function App() {
   // Usamos tu JSON para inicializar el catálogo
