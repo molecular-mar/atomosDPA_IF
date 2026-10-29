@@ -4,6 +4,13 @@ import MoleculeViewer from './components/Scene/MoleculeViewer';
 import HandTrackingPanel from './components/HandTracking/HandTrackingPanel';
 import ARButton from './components/UI/ARButton';
 
+const BASE = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+const normalizeModelUrl = (url: string) =>
+  `${BASE}${url.replace(/^\/+/, '')}`;
+
 interface AtomicSystem {
   id: string;
   name: string;
@@ -16,7 +23,12 @@ interface AtomicSystem {
 
 export default function App() {
   // Usamos tu JSON para inicializar el catálogo
-  const [selectedModel, setSelectedModel] = useState<AtomicSystem>(modelsData[0]);
+  const catalog = modelsData.map((item) => ({
+  ...item,
+  modelUrl: normalizeModelUrl(item.modelUrl),
+  }));
+  //const [selectedModel, setSelectedModel] = useState<AtomicSystem>(modelsData[0]);
+  const [selectedModel, setSelectedModel] = useState(catalog[0]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', fontFamily: 'system-ui, sans-serif' }}>
@@ -78,7 +90,7 @@ export default function App() {
             
             {/* Aquí está tu lista dinámica con scroll añadido para los 13 modelos */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '450px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-              {modelsData.map((item) => {
+              {catalog.map((item) => {
                 const isSelected = selectedModel.id === item.id;
                 return (
                   <button
