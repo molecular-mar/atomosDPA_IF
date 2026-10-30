@@ -4,7 +4,8 @@ import MoleculeViewer from './components/Scene/MoleculeViewer';
 import HandTrackingPanel from './components/HandTracking/HandTrackingPanel';
 import ARButton from './components/UI/ARButton';
 import GestureToolbar from './components/UI/GestureToolbar';
-import { nextMode, type HandMode } from './hooks/handMode';
+import GestureErrorBanner from './components/HandTracking/GestureErrorBanner';
+import { useHandTracking } from './hooks/useHandTracking';
 import PerfOverlay from './debug/PerfOverlay';
 import { DEBUG } from './debug/debugFlag';
 
@@ -33,8 +34,8 @@ export default function App() {
   }));
   //const [selectedModel, setSelectedModel] = useState<AtomicSystem>(modelsData[0]);
   const [selectedModel, setSelectedModel] = useState(catalog[0]);
-  // Modo del control por gestos (etapa B: todavía sin conectar a la cámara).
-  const [handMode, setHandMode] = useState<HandMode>('off');
+  // Control por gestos: en estado de React solo el modo y los errores (los landmarks van en handStore).
+  const hand = useHandTracking();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', fontFamily: 'system-ui, sans-serif' }}>
@@ -56,7 +57,7 @@ export default function App() {
             3D Viewer
           </span>
         </div>
-        <GestureToolbar mode={handMode} onPress={(pressed) => setHandMode((m) => nextMode(m, pressed))} />
+        <GestureToolbar mode={hand.mode} busy={hand.starting} onPress={hand.press} />
         <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
           IF-UNAM — Día de Puertas Abiertas 2026
         </span>
@@ -71,7 +72,14 @@ export default function App() {
             modelUrl={selectedModel.modelUrl} 
             hasAnimation={selectedModel.hasAnimation} 
           />
-          <HandTrackingPanel />
+          {hand.mode === 'gestures+camera' && (
+            <HandTrackingPanel
+              attachPreview={hand.attachPreview}
+              starting={hand.starting}
+              onClose={hand.closePreview}
+            />
+          )}
+          {hand.error && <GestureErrorBanner message={hand.error} onDismiss={hand.dismissError} />}
           {DEBUG && <PerfOverlay />}
           <ARButton 
             modelUrl={selectedModel.modelUrl} 

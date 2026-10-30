@@ -3,7 +3,8 @@ import type { ActiveHandMode, HandMode } from '../../hooks/handMode';
 interface GestureToolbarProps {
   mode: HandMode;
   onPress: (pressed: ActiveHandMode) => void;
-  disabled?: boolean;
+  /** Cámara iniciándose. Los botones siguen activos para poder cancelar o cambiar de modo. */
+  busy?: boolean;
 }
 
 const BUTTONS: { mode: ActiveHandMode; label: string; title: string }[] = [
@@ -12,9 +13,14 @@ const BUTTONS: { mode: ActiveHandMode; label: string; title: string }[] = [
 ];
 
 /** Botones de la barra superior para elegir el modo de control por gestos. */
-export default function GestureToolbar({ mode, onPress, disabled = false }: GestureToolbarProps) {
+export default function GestureToolbar({ mode, onPress, busy = false }: GestureToolbarProps) {
   return (
-    <div role="group" aria-label="Control por gestos" style={{ display: 'flex', gap: '0.5rem' }}>
+    <div
+      role="group"
+      aria-label="Control por gestos"
+      aria-busy={busy}
+      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+    >
       {BUTTONS.map((b) => {
         const pressed = mode === b.mode;
         return (
@@ -23,7 +29,6 @@ export default function GestureToolbar({ mode, onPress, disabled = false }: Gest
             type="button"
             aria-pressed={pressed}
             title={b.title}
-            disabled={disabled}
             onClick={() => onPress(b.mode)}
             style={{
               padding: '0.4rem 0.85rem',
@@ -34,8 +39,7 @@ export default function GestureToolbar({ mode, onPress, disabled = false }: Gest
               color: '#f8fafc',
               fontSize: '0.8rem',
               fontWeight: 600,
-              cursor: disabled ? 'wait' : 'pointer',
-              opacity: disabled ? 0.6 : 1,
+              cursor: busy ? 'progress' : 'pointer',
               transition: 'all 0.15s ease',
             }}
           >
@@ -43,6 +47,9 @@ export default function GestureToolbar({ mode, onPress, disabled = false }: Gest
           </button>
         );
       })}
+      <span aria-live="polite" style={{ fontSize: '0.75rem', color: '#94a3b8', minWidth: '7.5rem' }}>
+        {busy ? 'Iniciando cámara…' : ''}
+      </span>
     </div>
   );
 }

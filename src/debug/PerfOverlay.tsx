@@ -4,6 +4,19 @@ import { handStore } from '../hooks/handStore';
 
 const REFRESH_MS = 250;
 
+/** Valores de los gestos, para calibrar con números. */
+function handLines(): string {
+  const h = handStore;
+  if (!h.present) return 'mano     —';
+  return (
+    `palma    x ${h.palmX.toFixed(2)}  y ${h.palmY.toFixed(2)}\n` +
+    `tamaño   ${h.handSize.toFixed(3)}\n` +
+    `pinch    ${h.pinchRatio.toFixed(2)}  ${h.pinching ? 'CERRADO' : 'abierto'}\n` +
+    `rotDelta x ${h.rotationDelta.x.toFixed(2)}  y ${h.rotationDelta.y.toFixed(2)}\n` +
+    `zoom     ${h.zoomLevel.toFixed(2)}`
+  );
+}
+
 /** Overlay de rendimiento (solo con ?debug=1). Se actualiza con textContent, sin estado de React. */
 export default function PerfOverlay() {
   const ref = useRef<HTMLPreElement>(null);
@@ -17,7 +30,8 @@ export default function PerfOverlay() {
       el.textContent =
         `render   ${p.renderFps.toFixed(1)} fps  (peor ${p.worstFrameMs.toFixed(1)} ms)\n` +
         `detecc.  ${detecting ? `${handStore.detectionFps.toFixed(1)} Hz  (${p.detectMs.toFixed(1)} ms)` : '—'}\n` +
-        `delegado ${p.delegate ?? '—'}`;
+        `delegado ${p.delegate ?? '—'}\n` +
+        handLines();
     }, REFRESH_MS);
     return () => clearInterval(id);
   }, []);
