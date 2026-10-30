@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { perfStore } from './perfStore';
 import { handStore } from '../hooks/handStore';
+import { PINCH_GRAB, PINCH_RELEASE, ZOOM_MAX, ZOOM_MIN } from '../hooks/handProcessing';
 
 const REFRESH_MS = 250;
 
@@ -8,16 +9,21 @@ const REFRESH_MS = 250;
 function handLines(): string {
   const h = handStore;
   if (!h.present) return 'mano     —';
+  const deg = (r: number) => ((r * 180) / Math.PI).toFixed(0).padStart(4);
   return (
     `palma    x ${h.palmX.toFixed(2)}  y ${h.palmY.toFixed(2)}\n` +
-    `tamaño   ${h.handSize.toFixed(3)}\n` +
-    `pinch    ${h.pinchRatio.toFixed(2)}  ${h.pinching ? 'CERRADO' : 'abierto'}\n` +
-    `rotDelta x ${h.rotationDelta.x.toFixed(2)}  y ${h.rotationDelta.y.toFixed(2)}\n` +
-    `zoom     ${h.zoomLevel.toFixed(2)}`
+    `pinch    ${h.pinchRatio.toFixed(2)}  (agarra <${PINCH_GRAB}, suelta >${PINCH_RELEASE})\n` +
+    `agarre   ${h.pinching ? `SÍ  #${h.grabId}` : 'no'}\n` +
+    `tamaño   ${h.handSize.toFixed(3)}  ref ${h.grabRefSize.toFixed(3)}  razón ${h.sizeRatio.toFixed(2)}\n` +
+    `giro     x ${deg(h.rotationDelta.x)}°  y ${deg(h.rotationDelta.y)}°\n` +
+    `zoom     ${h.zoomLevel.toFixed(2)}  (${ZOOM_MIN}–${ZOOM_MAX})`
   );
 }
 
-/** Overlay de rendimiento (solo con ?debug=1). Se actualiza con textContent, sin estado de React. */
+/**
+ * Overlay de rendimiento y gestos (solo con ?debug=1; la tecla D lo oculta o muestra).
+ * Se actualiza con textContent, sin estado de React.
+ */
 export default function PerfOverlay() {
   const ref = useRef<HTMLPreElement>(null);
 
@@ -33,7 +39,17 @@ export default function PerfOverlay() {
         `delegado ${p.delegate ?? '—'}\n` +
         handLines();
     }, REFRESH_MS);
-    return () => clearInterval(id);
+    const onKey = (e: KeyboardEvent) => {
+      const el = ref.current;
+      if (el && (e.key === 'd' || e.key === 'D') && !e.repeat) {
+        el.style.display = el.style.display === 'none' ? '' : 'none';
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('keydown', onKey);
+    };
   }, []);
 
   return (
