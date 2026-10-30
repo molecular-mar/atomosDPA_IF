@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 import { handStore, resetHandStore, LANDMARK_COUNT } from './handStore';
 import { processHandFrame, processHandLost, resetFilters } from './handProcessing';
+import { perfStore } from '../debug/perfStore';
 
 export type HandTrackingStatus = 'off' | 'loading' | 'on' | 'error';
 
@@ -20,9 +21,13 @@ async function createLandmarker(): Promise<HandLandmarker> {
       numHands: 1,
     });
   try {
-    return await make('GPU');
+    const landmarker = await make('GPU');
+    perfStore.delegate = 'GPU';
+    return landmarker;
   } catch {
-    return await make('CPU');
+    const landmarker = await make('CPU');
+    perfStore.delegate = 'CPU';
+    return landmarker;
   }
 }
 
@@ -69,6 +74,7 @@ export function useHandTracking(): UseHandTracking {
     }
     resetHandStore();
     resetFilters();
+    perfStore.detectMs = 0;
   }, []);
 
   const invalidate = useCallback(() => {
@@ -119,6 +125,8 @@ export function useHandTracking(): UseHandTracking {
           lastVideoTime = video.currentTime;
           const now = performance.now();
           const result = landmarker.detectForVideo(video, now);
+          const cost = performance.now() - now;
+          perfStore.detectMs = perfStore.detectMs ? perfStore.detectMs * 0.9 + cost * 0.1 : cost;
           const hand = result.landmarks[0];
           if (hand) {
             const buf = handStore.landmarks;

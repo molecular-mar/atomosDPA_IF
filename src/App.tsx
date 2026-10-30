@@ -3,6 +3,8 @@ import modelsData from './data/modelsData.json';
 import MoleculeViewer from './components/Scene/MoleculeViewer';
 import HandTrackingPanel from './components/HandTracking/HandTrackingPanel';
 import ARButton from './components/UI/ARButton';
+import PerfOverlay from './debug/PerfOverlay';
+import { DEBUG } from './debug/debugFlag';
 
 const BASE = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -65,6 +67,7 @@ export default function App() {
             hasAnimation={selectedModel.hasAnimation} 
           />
           <HandTrackingPanel />
+          {DEBUG && <PerfOverlay />}
           <ARButton 
             modelUrl={selectedModel.modelUrl} 
             modelName={selectedModel.name} 

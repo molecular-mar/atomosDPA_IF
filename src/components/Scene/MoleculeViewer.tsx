@@ -3,6 +3,8 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useAnimations, Center, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import HandGestureGroup from './HandGestureGroup';
+import FpsProbe from '../../debug/FpsProbe';
+import { DEBUG } from '../../debug/debugFlag';
 
 const BASE = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -137,6 +139,8 @@ export default function MoleculeViewer({
         camera={{ position: [0, 0, 5], fov: 45 }}
         style={{ background: '#020617' }}
       >
+        {DEBUG && <FpsProbe />}
+
         {/* Configuración de Iluminación */}
         <ambientLight intensity={0.9} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} castShadow />
